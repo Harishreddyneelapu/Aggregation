@@ -1,8 +1,7 @@
 import HttpStatus from 'http-status-codes';
 import * as UserService from '../services/user.service';
 import User from '../models/user.model';
-// import UserDb from '../models/usersdb.model';
-// import UserDb from '../models/usersdb.model';
+import UserAgg from '../models/usersdb.model';
 
 // /**
 //  * Controller to get all users available
@@ -25,18 +24,30 @@ export const getAllUsers = async (req, res, next) => {
 
 
 
-
-
-
 export const getUsersFromData = async(req,res)=>{
   try{
+    // const stats = await User.aggregate([
+    //   {$match:{eyeColor:'green'}}
+    // ])
+    // const stats = await User.aggregate([
+    //   {$match:{index:{$gte:980}}}
+    // ])
     const stats = await User.aggregate([
-      {$match:{FirstName:"harish"}}
+      {$match:{index:{$gte:980}}},
+      {$group:{
+        _id:'$gender',
+        avgAge:{$avg:'$age'},
+        maxAge:{$max:'$age'},
+        minAge:{$min:'$age'},
+        totalAge:{$sum:'$age'},
+        genderCount:{$sum:1}
+      }}
     ])
     res.status(HttpStatus.OK).json({
       code: HttpStatus.OK,
-      data: stats,
-      message: 'get match successfully'
+      message: 'get match successfully',
+      count:stats.length,
+      data: stats
     });
     console.log(stats);
   }catch(err){
