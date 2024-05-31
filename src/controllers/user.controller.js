@@ -33,15 +33,17 @@ export const getUsersFromData = async(req,res)=>{
     //   {$match:{index:{$gte:980}}}
     // ])
     const stats = await User.aggregate([
-      {$match:{index:{$gte:980}}},
+      {$match:{index:{$gte:950}}},
       {$group:{
-        _id:'$gender',
+        _id:'$eyeColor',
         avgAge:{$avg:'$age'},
         maxAge:{$max:'$age'},
         minAge:{$min:'$age'},
         totalAge:{$sum:'$age'},
-        genderCount:{$sum:1}
-      }}
+        colorCount:{$sum:1}
+      }},
+      {$sort:{minAge:-1}},
+      {$match:{maxAge:{$gte:39}}}
     ])
     res.status(HttpStatus.OK).json({
       code: HttpStatus.OK,
